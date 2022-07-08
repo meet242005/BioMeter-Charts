@@ -1,4 +1,6 @@
-
+## Experience this site live:  
+https://meet242005.github.io/WebsiteDevProject/  
+  
 ## MyBiometer
 Web Application to generate biometers or dowsing dials
   
@@ -27,7 +29,7 @@ https://www.subtil.net/en/
 - Smalltalk https://github.com/coderaiser/smalltalk
 - Sortable https://github.com/RubaXa/Sortable
   
-## This project was just modified for personal use, however you are free to download and use it.  
+## This project was just modified for personal use, however you are free to use it.  
   
 ## Licence
 GPLv3

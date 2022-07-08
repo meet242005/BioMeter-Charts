@@ -1,5 +1,5 @@
-## Experience this site live:  
-https://meet242005.github.io/WebsiteDevProject/  
+## Experience this site live at:  
+https://meet242005.github.io/BioMeter-Charts/  
   
 ## MyBiometer
 Web Application to generate biometers or dowsing dials

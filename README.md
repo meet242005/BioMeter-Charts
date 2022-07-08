@@ -29,7 +29,7 @@ https://www.subtil.net/en/
 - Smalltalk https://github.com/coderaiser/smalltalk
 - Sortable https://github.com/RubaXa/Sortable
   
-## This project was just modified for personal use, however you are free to use it.  
+### This project was just modified for personal use, however you are free to use it.  
   
 ## Licence
 GPLv3

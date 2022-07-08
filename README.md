@@ -7,17 +7,17 @@ MyBiometer is free software made with <3
 https://framagit.org/Brouillon/myBiometer
 
 ## What did I modified?
-.Simplified the homepage
-.Translated the website to English from French changing all required string values
-.Added Ability to insert custom watermark
-.Added feature to show/hide watermark
-.Added feature to change the inner lines width
-.Added option to touch the ends of base line
-.Added ability to change the ouput background to transparent
-.Redesigned the chart canvas to align the title and the watermark to the base of the canvas instead of top
-.Redesigned the borders to have same thickness in circumference as well as the base
-.Changed few default values also added few placeholder text
-.Made the website slightly responsive to smaller width devices (mobiles)
+.Simplified the homepage  
+.Translated the website to English from French changing all required string values  
+.Added Ability to insert custom watermark  
+.Added feature to show/hide watermark  
+.Added feature to change the inner lines width  
+.Added option to touch the ends of base line  
+.Added ability to change the ouput background to transparent  
+.Redesigned the chart canvas to align the title and the watermark to the base of the canvas instead of top  
+.Redesigned the borders to have same thickness in circumference as well as the base  
+.Changed few default values also added few placeholder text  
+.Made the website slightly responsive to smaller width devices (mobiles)  
 
 ## Visit Subtil.net to be able to use more features online
 https://www.subtil.net/en/

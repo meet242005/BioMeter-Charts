@@ -1,0 +1,1145 @@
+<!doctype html>
+<!--
+   This file is part of myBiometer.
+
+   Copyright 2017 Brouillon <brouillon@eftar.net>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+-->
+<html lang="en">
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<head>
+
+    <meta charset="utf-8">
+    <title>Charts</title>
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/smalltalk.min.css">
+
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="js/jquery-2.2.1.min.js"></script>
+    <script src="js/smalltalk.min.js"></script>
+    <!--<script src="js/jquery.translate.js"></script>-->
+
+    <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/vue.min.js"></script>
+    <script src="js/Sortable.min.js"></script>
+
+    <script>if (window.module) module = window.module;</script>
+
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: helvetica, verdana, sans;
+        }
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 0;
+            margin-top: 10px;
+
+        }
+
+        #myBiometer {
+            float:left;
+            width:400px;
+            background-color: #f5f5f5;
+            height:100%;
+            overflow-y: scroll;
+        }
+        #myBiometer > div {
+            padding: 5px;
+        }
+        #myBiometer .panel, #myBiometer .panel-heading {
+            border-radius: 0;
+        }
+        #myBiometer .panel-footer, #myBiometer .panel-heading {
+            padding: 10px;
+        }
+
+        #myBiometer .group .input-group-sm > .form-control, #myBiometer .group .input-group-sm > .input-group-addon, #myBiometer .group .input-group-sm > .input-group-btn > .btn {
+            border-radius: 0;
+        }
+        #myBiometer #biometerList .panel-primary .panel-heading a {
+            color: #fff;
+        }
+
+        #biometer {
+            margin-left: 400px;
+            padding: 0;
+            overflow: auto;
+        }
+        #biometer #homeScreen {
+            padding: 0 20px;
+        }
+        #biometer #homeScreen li {
+            padding: 5px;
+        }
+        #biometer canvas.big {
+            height: 100%;
+            width: 100%;
+            object-fit: contain;
+        }
+
+        .cryptedmail:after {
+            content: attr(data-name) "@" attr(data-domain) "." attr(data-tld);
+        }
+
+        div.smalltalk:after{
+            content:'';
+            width:100%;
+            height:100%;
+            position:absolute;
+            z-index:-99;
+            top:0;
+            left:0;
+            opacity:0.75;
+            background-color: #000;
+        }
+
+        @media only screen and (max-width: 600px) {
+   
+   
+            #myBiometer {
+        
+            width:100%;
+            background-color: #f5f5f5;
+            display:block ;
+            margin: auto;
+         
+            }
+
+            #biometer {
+                margin: 200px;
+              
+            width:100%;
+            background-color: #f5f5f5;
+            }
+            #biometer canvas.big {
+            object-fit:fill;
+        }
+
+        }
+    
+    </style>
+
+</head>
+<body>
+    <div id="myBiometer">
+        <div>
+            <form id="formControl" onsubmit="return false;">
+                <h1><img src="favicon.png" style="width:47px" /> Charts</h1>
+
+                <div id="biometerList">
+                    <br />
+                    <div class="panel panel-primary" style="margin:-10px -5px 0 -5px;">
+                        <div class="panel-heading">
+                            <span class="glyphicon glyphicon-folder-open"></span>
+                            &nbsp;<a href="#" v-on:click="displayBiometerList()">My Charts</a>
+                        </div>
+                        <div class="panel-body" style="padding:0;">
+                            <table style="border-bottom:1px solid #ccc" class="table table-striped table-hover table-condensed" id="groupItems">
+                                <tbody>
+                                    <tr v-for="item in biometerList">
+                                        <td>
+                                            <a href="#" v-on:click="openBiometer(item.biometerID)">
+                                                <span v-if="item.biometerTitle">{{ item.biometerTitle }}</span>
+                                                <span v-else>Unnamed Chart</span>
+                                            </a>
+                                        </td>
+                                        <td style="width:40px;">
+                                            <a href="#" class="btn btn-default" v-on:click="removeBiometer(item.biometerID)"><span class="glyphicon glyphicon-remove"></span></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div style="padding: 10px">
+                                <a class="btn btn-primary btn-sm btn-block" id="newBiometer" v-on:click="newBiometer()"><span class="glyphicon glyphicon-plus"></span> Create a New Chart</a>
+                                <br />
+                                <div class="alert alert-info" role="alert">
+                                    The data is saved automatically on your browser, you can also <a id="downloadBiometersData" href="#" v-on:click="downloadBiometersData()"><u>download</u></a>
+                                    and/or <a href="#" v-on:click="displayImport()"><u>import</u></a> it.</div>
+
+                                <div id="importDataDiv" class="form-group collapse">
+                                    <label>Import My Data</label>
+                                    <input type="file" class="btn btn-default btn-sm btn-block" v-on:change="importBiometerData($event)">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="biometerDetail" class="collapse">
+
+                    <div class="panel panel-primary" style="margin:5px -5px 0 -5px;">
+
+                        <div class="panel-heading"><span class="glyphicon glyphicon-edit"></span> &nbsp;Chart Details</div>
+                        <div class="panel-body" style="padding:10px;">
+
+                            <div class="form-group">
+                                <label>Chart Title :</label><br />
+                                <div class="input-group input-group-sm">
+                                    <input type="text" placeholder="Enter Chart Title" v-model="mybiometer.biometerTitle" v-on:focus="focusTitle($event)" v-on:change="changeTitle($event)" class="form-control input-sm" name="biometerTitle" id="biometerTitle" />
+                                    <span class="input-group-btn">
+                                        <a href="#" class="btn btn-default" v-on:click="openTitleSettings" /><span class="glyphicon glyphicon-cog"></span></a>
+                                    </span>
+                                </div>
+                            </div>
+
+                           
+
+                            <div class="form-group">
+                                <label>Border and Colour :</label>
+                                 <div class="input-group input-group-sm">
+                                    <input type="text" placeholder="Enter Border Size (<200)" v-model="mybiometer.biometerBorderWidth" v-on:focus="focusBorder($event)" v-on:change="changeBorder($event)" class="form-control input-sm" id="biometerBorderWidth" name="biometerBorderWidth" >
+                                    <span class="input-group-btn">
+                                        <input type="color" v-model="mybiometer.biometerBorderColor" id="biometerBorderColor" class="btn btn-default" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Inner Lines Width :</label>
+                                <input type="text" v-model="mybiometer.biometerLineWidth" v-on:focus="focusBorder($event)" v-on:change="changeBorder($event)" class="form-control input-sm" id="biometerLineWidth" name="biometerLineWidth" >
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label for="biometerTitleDisplay">  Touch Ends of Bottom Lines? :</label>
+                                        <input type="checkbox" v-model="mybiometer.biometertouchline" v-on:focus="focusTitleFontSize($event)" v-on:change="changeTitleFontSize($event)" class="form-control input-sm" id="biometertouchline" />    
+                                    </div>
+                                    
+                                </div>
+                                </div>
+                            </div>
+
+                            
+                            <div class="panel panel-default" style="margin:0 -10px;">
+                                <div class="panel-heading">
+                                    <span class="glyphicon glyphicon-move hide"></span>
+                                    <span class="caret hide"></span>
+                                        Groups
+                                    <div class="pull-right">
+                                        <button type="button" class="btn btn-default btn-sm groupFontSetting" v-on:click="openGroupFontSetting()" style="margin-top:-5px;"><span class="glyphicon glyphicon-cog"></span></button>
+                                    </div>
+                                </div>
+                                <div class="panel-body" style="padding:0;">
+                                    <table style="width:100%;" class="group" id="groupItems">
+                                        <tbody id="rows" v-sortable="{ handle: '.handle', onEnd: reorderItems, cancel: '' }">
+                                            <tr v-for="item in mybiometer.currentGroup.items" :key="item.id">
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-btn">
+                                                            <a href="#" class="btn btn-default handle"v-on:focus="focusHandle($event)"><span class="glyphicon glyphicon-move"></span></a>
+                                                        </span>
+                                                        <input v-model="item.text" type="text" class="form-control input-sm" placeholder="Enter Content">
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default" v-on:click="removeItem(item)"><span class="glyphicon glyphicon-remove"></span></button>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="panel-footer" >
+                                    <div class="input-group input-group-sm" id="groupCounter">
+                                        <span class="input-group-btn">
+                                            <button type="button" v-on:click="removeLastItem()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-minus"></span></button>
+                                        </span>
+                                        <input type="text" v-on:click="setItemNumber()" v-model="mybiometer.currentGroup.items.length" class="form-control input-sm" readonly="readonly">
+                                        <span class="input-group-btn">
+                                            <button type="button" v-on:click="addItem()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-plus"></span></button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <br />
+
+                            <div class="form-group">
+                                <label for="biometerWidthHelper">Output Size :</label><br />
+                                <select class="form-control input-sm" v-on:change="changeWidthHelper($event)" id="biometerWidthHelper">
+                                    <option value="A5">A5</option>
+                                    <option value="A4">A4</option>
+                                    <option value="CUSTOM">Personalize</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Pixel Width :</label><br />
+                                <input type="text" v-model="mybiometer.biometerWidth" v-on:focus="focusWidth($event)" v-on:change="changeWidth($event)" class="form-control input-sm" name="biometerWidth" id="biometerWidth" />
+                            </div>
+
+                            
+                                <div class="form-inline">
+                                <div class="form-group">
+
+                                    <label for="biometerTitleDisplay">  Set Transparent Background? :</label>
+                                    <input type="checkbox" v-model="mybiometer.biometersetbg" v-on:focus="focusTitleFontSize($event)" v-on:change="changeTitleFontSize($event)" class="form-control input-sm" id="biometersetbg" />    
+                                </div>
+                                </div>
+
+                                <div>
+                                    <div class="form-group">
+                                <a class="btn btn-primary btn-sm btn-block" id="downloadBiometer"  v-on:click="downloadBiometer">Download Image (.png)</a>
+                                </div>
+                            </div>
+
+            
+                        <div class="modal fade" id="titleSettingModal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog modal-md" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title">Title Settings</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <label for="biometerTitleDisplay">Show Title :</label>
+                                                <input type="checkbox" v-model="mybiometer.biometerTitleDisplay" v-on:focus="focusTitleFontSize($event)" v-on:change="changeTitleFontSize($event)" class="form-control input-sm" id="biometerTitleDisplay" />        
+                                               
+                                                <label for="biometerTitleDisplay">Show watermark:</label>
+                                                <input type="checkbox" v-model="mybiometer.biometerWatermarkDisplay" v-on:focus="focusTitleFontSize($event)" v-on:change="changeTitleFontSize($event)" class="form-control input-sm" id="biometerWatermarkDisplay" />
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Watermark :</label><br />
+                                            <input type="text" placeholder="Enter Custom Watermark Text" v-model="mybiometer.biometerWatermark" v-on:focus="focusWaterMark($event)" v-on:change="changeWaterMark($event)" class="form-control input-sm" name="biometerWatermark" id="biometerWatermark" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="biometerTitleFontSize">Title Size and Colour :</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" placeholder="Press Enter to apply" v-model="mybiometer.biometerTitleFontSize" id="biometerTitleFontSize" class="form-control input-sm" />
+                                                <span class="input-group-btn">
+                                                    <input type="color" class="btn btn-default" v-model="mybiometer.biometerTitleColor" />
+                                                </span>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="groupFontSettingModal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog modal-md" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title">Settings for Group Texts</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label>Text Size and Colour :</label>
+                                             <div class="input-group input-group-sm">
+                                                <input type="text" v-model="mybiometer.currentGroup.groupFontSize" v-on:focus="focusGroupFontSize($event)" v-on:change="changeGroupFontSize($event)" class="form-control input-sm" id="groupFontSize" name="groupFontSize" >
+                                                <span class="input-group-btn">
+                                                    <input type="color" id="groupFontColor" class="btn btn-default" v-model="mybiometer.currentGroup.groupFontColor" />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="biometer">
+        
+        <div id="homeScreen">
+
+            <h2>Bienvenue</h2>
+
+            My Biometer permet de créer facilement des biomètres ou cadrans de radiesthésie.
+
+            <br />
+
+            <ul>
+                <li>Une <a href="https://framalistes.org/sympa/subscribe/mybiometer" class="ls-modal">liste de diffusion <span class="glyphicon glyphicon-envelope"></span></a> pour discuter utilisation et évolution du logiciel.</li>
+
+                <li>MyBiometer est un <a href="https://fr.wikipedia.org/wiki/Logiciel_libre" class="ls-modal">logiciel libre</a> fait avec <span class="glyphicon glyphicon-heart"></span>, code source sur <a href="https://framagit.org/Brouillon/myBiometer" class="ls-modal">framagit</a>.</li>
+            </ul>
+
+            <hr />
+
+            <h3>Pour commencer</h3>
+
+
+            <div class="row">
+
+                <div class="col-lg-6 col-md-8 text-center">
+                    <strong>Cliquez sur "Créer un nouveau biomètre"</strong><br />
+                    <img src="img/start.png" /><br />
+                </div>
+
+            </div>
+
+            <hr />
+
+            <h3>
+                À découvrir :
+                <a href="https://www.subtil.net" style="vertical-align:middle;text-decoration:none !important;" >
+                    <img src="https://www.subtil.net/views/img/media/logo-subtil.png"  alt="Subtil - Site de partage et création de planches de radiesthésie pour penduler" style="vertical-align:text-bottom" width="150" />
+                </a>
+                Partage et Création de biomètres
+            </h3>
+
+            <div class="row">
+
+                <div class="col-lg-4 col-md-6">
+                    <a href="https://www.subtil.net"><img src="https://www.subtil.net/views/img/media/share.fr.png" alt="Cadrans et planches de radiesthésie à técharger - Subtil" class="img-responsive" /></a><br />
+                </div>
+                <div class="col-lg-4 col-lg-offset-3 col-md-6">
+                    <a href="https://www.subtil.net"><img src="https://www.subtil.net/views/img/media/generator.fr.png"  alt="Application / Logiciel générateur d'abaques de radiesthésie - Subtil" class="img-responsive" /></a><br />
+                </div>
+
+            </div>
+
+            <div style="position:absolute;bottom:5px;right:5px;">
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="browserModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Page web</h4>
+                </div>
+                <div class="modal-body" style="height:500px">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+    //Add sortable capacity into vuejs
+    Vue.directive('sortable', {
+      inserted: function (el, binding) {
+        new Sortable(el, binding.value || {})
+      }
+    });
+
+    var defaultBiometer = {
+        biometerFormatVersion:  '1.1',
+        biometerID:             null,
+        biometerTitle:          'Chart Title',
+        biometerTitleDisplay:   true,
+        biometerWatermarkDisplay:   true,
+        biometertouchline:   false,
+        biometersetbg:   false,
+        biometerWatermark: 'Created by Makarand',
+        biometerTitleFontSize:  '40',
+        biometerTitleColor:     '#000',
+        biometerWidth:          1000,
+        biometerbg:          "white",
+        biometerBorderWidth:    10,
+        biometerLineWidth:    01,
+        biometerBorderColor:    '#337ab7',
+        currentGroup:           null,
+        groups: [{
+            groupFontSize:  25,
+            groupFontColor: '#337ab7',
+            items: [
+                {
+                    id: 1,
+                    text: 'Title 1'
+                },
+                {
+                    id: 2,
+                    text: 'Title 2'
+                },
+                {
+                    id: 3,
+                    text: 'Title 3'
+                },
+                {
+                    id: 4,
+                    text: 'Title 4'
+                }
+            ]
+        }]
+    };
+
+    var currentBiometer = false;
+
+    var biometerList = [];
+
+    $( document ).ready(function() {
+
+        //test if there is no support for colour attribute please use IE Edge / firefox / Chromium
+        colorInput = $('<input type="color" value="!" />')[0];
+        if (colorInput.type !== 'color' || colorInput.value === '!')
+        {
+            $('body').html('<div style="padding:50px;"><h1>My Biometer</h1><div class="jumbotron"><div class="container"><h2>Votre naviagateur n\'est pas compatible avec le site</h2><p>Vous pouvez utiliser par exemple un des navigateurs suivants :</p><p class="text-center"><a href="https://www.mozilla.org/fr/firefox/new/"><img src="https://www.mozilla.org/media/img/styleguide/identity/firefox/usage-standard.dd994d6216e9.png" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.google.com/chrome/browser/desktop/index.html"><img src="https://www.google.com/chrome/assets/common/images/chrome_logo_2x.png?mmfb=a5234ae3c4265f687c7fffae2760a907" /></a></p></div></div></div>');
+            return;
+        }
+
+        //Load all biometers list
+        try {
+            biometerList = JSON.parse( localStorage.getItem( 'biometerList' ) );
+        } catch(e) { }
+
+        if ( ! biometerList)
+            biometerList = [];
+
+        //check biometer format
+        for (var i = 0; i < biometerList.length; i++)
+            biometerList[ i ] = checkBiometerFormat(biometerList[ i ]);
+
+        saveBiometersData();
+
+        displayBiometerList();
+
+    });
+
+    function getUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });
+    }
+
+    function saveBiometersData() {
+
+        localStorage.setItem('biometerList', JSON.stringify(biometerList) );
+
+    }
+
+    function sortBiometerList() {
+
+        biometerList.sort(function(a, b) {
+            return (a.biometerTitle < b.biometerTitle) ? -1 : 1;
+        });
+
+    }
+
+    function hideBiometerList() {
+        $('#biometerList .panel').removeClass('panel-primary').addClass('panel-default');
+        $('#biometerList .panel-heading .glyphicon').removeClass('glyphicon-folder-open').addClass('glyphicon-folder-close');
+        $('#biometerList .panel-body').hide();
+    }
+
+    function displayBiometerList() {
+
+        $('#biometerList .panel').removeClass('panel-default').addClass('panel-primary');
+        sortBiometerList();
+
+        if (typeof biometerListView == 'undefined')
+        {
+            //create List
+            biometerListView = new Vue({
+                el: '#biometerList',
+                data: {
+                    biometerList: biometerList
+                },
+                methods: {
+                    removeBiometer: function(biometerID) {
+                        smalltalk.confirm('Delete Chart', 'Do you want to delete this chart?').then(function() {
+                            for (idx in biometerList) {
+                                if (biometerList[ idx ].biometerID === biometerID) {
+                                    biometerList.splice(idx, 1);
+                                }
+                            }
+                            saveBiometersData();
+                        });
+                    },
+                    newBiometer: function() {
+                        smalltalk.prompt('Create Chart', 'Enter New Chart Name :', '').then(function(name) {
+                            if (name != false && name != null || name == '') {
+                                newBiometer = false;
+                                newBiometer = JSON.parse(JSON.stringify(defaultBiometer));
+                                newBiometer.biometerID = getUUID();
+                                newBiometer.biometerTitle = name;
+                                //Add to list
+                                biometerList.push(newBiometer);
+                                //Reorder && save
+                                sortBiometerList();
+                                saveBiometersData();
+
+                                biometerListView.openBiometer(newBiometer.biometerID);
+                            }
+                        });
+                    },
+                    openBiometer: function(biometerID) {
+                        for (idx in biometerList) {
+                            if (biometerList[ idx ].biometerID === biometerID) {
+                                openBiometer(biometerList[ idx ]);
+                            }
+                        }
+                    },
+                    downloadBiometersData: function() {
+                        $('#downloadBiometersData')[0].href = 'data:application/octet-stream;charset=utf-8,'+encodeURIComponent(JSON.stringify(biometerList));
+                        $('#downloadBiometersData')[0].download = 'biometerList.json';
+                    },
+                    displayImport: function() {
+                        $('#importDataDiv').show();
+                        return false;
+                    },
+                    importBiometerData: function(evt) {
+                        var files = evt.target.files;
+                        var file = files[0];
+                        var reader = new FileReader();
+                        reader.onload = function() {
+                            var tempData;
+                            try {
+                                tempData = JSON.parse( this.result );
+                            } catch(e) {
+                                smalltalk.alert('Error', 'An error occurred while loading your data');
+                            }
+                            if (tempData)
+                            {
+                                var processed = false;
+                                for (idx in tempData) {
+
+                                    processed = false;
+                                    //Vérification, ce biomètre existe t'il déjà ?
+                                    for (idx2 in biometerList) {
+                                        if (biometerList[ idx2 ].biometerID == tempData[ idx ].biometerID) {
+                                            processed = true;
+                                            if (confirm('Le biomètre "'+(tempData[ idx ].biometerTitle == '' ? 'Unnamed Biometer' : tempData[ idx ].biometerTitle)+'" already exists, do you want to replace it?')) {
+                                                biometerList[ idx2 ] = checkBiometerFormat(tempData[ idx ]);
+                                            } else {
+                                                console.log('Biometer Ignored !');
+                                            }
+                                        }
+                                    }
+                                    if (processed == false) {
+                                        tempData[ idx ].biometerID = getUUID();
+                                        //check biometer format
+                                        tempData[ idx ] = checkBiometerFormat(tempData[ idx ]);
+                                        //Add to list
+                                        biometerList.push(tempData[ idx ]);
+                                    }
+                                }
+                                //Reorder && save
+                                sortBiometerList();
+                                saveBiometersData();
+                                return;
+                            }
+                        }
+                        reader.readAsText(file);
+                    }
+                }
+            });
+        }
+
+        $('#biometerList .panel-heading .glyphicon').removeClass('glyphicon-folder-close').addClass('glyphicon-folder-open');
+        $('#biometerList .panel-body').show();
+
+        $('#biometerDetail').hide();
+
+        displayHomeScreen();
+
+    }
+
+    function displayHomeScreen() {
+        $('#homeScreen').hide();
+        $('#canvas').hide();
+    }
+
+    function hideHomeScreen() {
+        $('#homeScreen').hide();
+    }
+
+    //While updating the sofware some new field can be required in newer version
+    function checkBiometerFormat(biometer) {
+
+        //Check format version
+        if (typeof biometer.biometerFormatVersion == 'undefined') {
+
+            biometer.biometerFormatVersion = '1.0';
+
+            if (typeof biometer.biometerTitleDisplay == 'undefined')
+                biometer.biometerTitleDisplay = defaultBiometer.biometerTitleDisplay;
+            if (typeof biometer.biometerWatermarkDisplay == 'undefined')
+                biometer.biometer.biometerWatermarkDisplay = defaultBiometer.biometerWatermarkDisplay;
+                if (typeof biometer.biometertouchline == 'undefined')
+                biometer.biometer.biometertouchline = defaultBiometer.biometertouchline;
+                if (typeof biometer.biometersetbg== 'undefined')
+                biometer.biometer.biometersetbg = defaultBiometer.biometersetbg;
+                if (typeof biometer.biometerWatermark == 'undefined')
+                biometer.biometer.biometerWatermark = defaultBiometer.biometerWatermark;
+            if (typeof biometer.biometerTitleFontSize == 'undefined')
+                biometer.biometerTitleFontSize = defaultBiometer.biometerTitleFontSize;
+            if (typeof biometer.biometerTitleColor == 'undefined')
+                biometer.biometerTitleColor = defaultBiometer.biometerTitleColor;
+        }
+        //bug id missing in version 1.0
+        if (biometer.biometerFormatVersion == '1.0') {
+            //adding id in items
+            for (var i = 0; i < biometer.groups.length; i++) {
+                for (var ii = 0; ii < biometer.groups[ i ].items.length; ii++) {
+                    if (typeof biometer.groups[ i ].items[ ii ].id == 'undefined')
+                        biometer.groups[ i ].items[ ii ].id = getUUID();
+                }
+            }
+        }
+
+        biometer.biometerFormatVersion = defaultBiometer.biometerFormatVersion;
+
+        return biometer;
+
+    }
+
+    function openBiometer(biometer) {
+
+        hideBiometerList();
+        hideHomeScreen();
+        $('#biometerDetail').show();
+
+        currentBiometer = biometer;
+        //set first group as current
+        currentBiometer.currentGroup = currentBiometer.groups[0];
+
+        if (typeof biometerDetailView == 'undefined')
+        {
+
+            biometerDetailView = new Vue({
+                el: '#biometerDetail',
+                data: {
+                    mybiometer: currentBiometer
+                },
+                methods: {
+                    openTitleSettings: function() {
+                        $('#titleSettingModal').modal();
+                    },
+                    //display modal on click font setting group
+                    openGroupFontSetting: function() {
+                        $('#groupFontSettingModal').modal();
+                    },
+                    removeItem: function(item) {
+                        currentBiometer.currentGroup.items.splice(currentBiometer.currentGroup.items.indexOf(item), 1);
+                    },
+                    removeLastItem: function() {
+                        currentBiometer.currentGroup.items.pop();
+                    },
+                    addItem: function() {
+                        currentBiometer.currentGroup.items.push({id: getUUID(),text: ''});
+                    },
+                    reorderItems: function(evt) {
+                        Vue.nextTick(function () {
+                            const item = currentBiometer.currentGroup.items.splice(evt.oldIndex, 1)[ 0 ];
+                            currentBiometer.currentGroup.items.splice(evt.newIndex, 0, item);
+                        });
+                    },
+                    setItemNumber: function() {
+                        smalltalk.prompt('Add Rows', 'Enter Number of Rows ', currentBiometer.currentGroup.items.length+'').then(function(nb) {
+                            if (nb === null)
+                                return;
+                            if (nb*1 > 200 || nb < 1)
+                            {
+                                nb = '';
+                            }
+
+                            if ( ! isInt(nb)) {
+                                smalltalk.alert('Error', 'Rows should be less than 200');
+                            }
+                            else
+                            {
+                                if (isInt(nb)) {
+                                    Vue.nextTick(function () {
+                                        if (nb > currentBiometer.currentGroup.items.length)
+                                        {
+                                            while(nb > currentBiometer.currentGroup.items.length) {
+                                                currentBiometer.currentGroup.items.push({id: getUUID(),text: ''});
+                                            }
+                                        }
+                                        else
+                                        {
+                                            currentBiometer.currentGroup.items = currentBiometer.currentGroup.items.slice(0, nb);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    changeTitle: function(evt) {
+                        var elem = evt.target,
+                            oldValue = elem.defaultValue,
+                            newValue = elem.value;
+                        if (newValue.length > 0)
+                            elem.defaultValue = newValue;
+                        else {
+                            currentBiometer.biometerTitle = elem.defaultValue;
+                            smalltalk.alert('Error', 'You must enter a title');
+                            setTimeout(function() { $(elem).focus();}, 0);
+                        }
+                    },
+                    focusTitle: function(evt) {
+                        var elem = evt.target;
+                        if (elem.defaultValue == '')
+                            elem.defaultValue = elem.value;
+                    },
+                    changeTitleSize: function(evt) {
+                        var elem = evt.target,
+                            oldValue = elem.defaultValue,
+                            newValue = elem.value;
+                        if (isInt(newValue) && newValue < 100)
+                            elem.defaultValue = newValue;
+                        else {
+                            currentBiometer.biometerTitleFontSize = elem.defaultValue;
+                            smalltalk.alert('Error', 'Please enter a number less than 100');
+                            $('#titleSettingModal').modal();
+                        }
+                    },
+                    focusTitleSize: function(evt) {
+                        var elem = evt.target;
+                        if (elem.defaultValue == '')
+                            elem.defaultValue = elem.value;
+                    },
+                    changeGroupFontSize: function(evt) {
+                        var elem = evt.target,
+                            oldValue = elem.defaultValue,
+                            newValue = elem.value;
+                        if (isInt(newValue) && newValue < 100)
+                            elem.defaultValue = newValue;
+                        else {
+                            currentBiometer.currentGroup.groupFontSize = elem.defaultValue;
+                            smalltalk.alert('Error', 'Please enter a number less than 100');
+                            $('#groupFontSettingModal').modal();
+                        }
+                    },
+                    focusGroupFontSize: function(evt) {
+                        var elem = evt.target;
+                        if (elem.defaultValue == '')
+                            elem.defaultValue = elem.value;
+                    },
+                    changeWidth: function(evt) {
+                        var elem = evt.target,
+                            oldValue = elem.defaultValue,
+                            newValue = elem.value;
+                        if (isInt(newValue) && newValue < 5000)
+                            elem.defaultValue = newValue;
+                        else {
+                            currentBiometer.biometerWidth = elem.defaultValue;
+                            smalltalk.alert('Error', 'Please enter a number less than 5000');
+                            setTimeout(function() { $(elem).focus();}, 0);
+                        }
+                    },
+                    focusWidth: function(evt) {
+                        var elem = evt.target;
+                        if (elem.defaultValue == '')
+                            elem.defaultValue = elem.value;
+                    },
+                    changeBorder: function(evt) {
+                        var elem = evt.target,
+                            oldValue = elem.defaultValue,
+                            newValue = elem.value;
+                        if (isInt(newValue) && newValue < 200)
+                            elem.defaultValue = newValue;
+                        else {
+                            currentBiometer.biometerBorderWidth = elem.defaultValue;
+                            smalltalk.alert('Error', 'Please enter a number less than 200');
+                            setTimeout(function() { $(elem).focus();}, 0);
+                        }
+                    },
+                    focusBorder: function(evt) {
+                        var elem = evt.target;
+                        if (elem.defaultValue == '')
+                            elem.defaultValue = elem.value;
+                    },
+                    focusHandle: function(evt) {
+                        //console.log(evt);
+                        //Todo push focus left or right if from tab or alt+tab
+                        /*$(':input').keypress(function() {
+                            $(this).next(':input').focus();
+                        });*/
+                    },
+                    changeWidthHelper: function(evt) {
+                        var elem = $(evt.target);
+                        if (elem.val() == 'A4')
+                            currentBiometer.biometerWidth = '2000';
+                        else if (elem.val() == 'A5')
+                            currentBiometer.biometerWidth = '1000';
+
+                    },
+                    downloadBiometer:  function() {
+                                    
+                        $('#downloadBiometer')[0].href = document.getElementById('canvas').toDataURL();
+                        $('#downloadBiometer')[0].download = sanitize(currentBiometer.biometerTitle) + '.png';
+                 
+                    },
+                    downloadBiometerTRAN:  function() {
+                                     
+                        $('#downloadBiometerTRAN')[0].href = document.getElementById('canvas').toDataURL();
+                        $('#downloadBiometerTRAN')[0].download = sanitize(currentBiometer.biometerTitle) + '.png';
+                
+                    }
+                },
+                watch: {
+                    'mybiometer': {
+                        handler: function (val, oldVal) {
+                            if (currentBiometer.biometerWidth == '1000')
+                                $('#biometerWidthHelper').val('A5');
+                            else if (currentBiometer.biometerWidth == '2000')
+                                $('#biometerWidthHelper').val('A4');
+                            else
+                                $('#biometerWidthHelper').val('CUSTOM');
+                            drawBiometer();
+                            saveBiometersData();
+                        },
+                        deep: true
+                    }
+                }
+            });
+
+        }
+        else {
+            //replace data
+            biometerDetailView.$data.mybiometer = biometer;
+        }
+
+        drawBiometer();
+    }
+
+    function drawBiometer(width) {
+
+        if (typeof width == 'undefined')
+            width = false;
+
+        var container = document.getElementById('biometer');
+        var canvas = document.getElementById('canvas');
+
+        if ( ! container)
+            return;
+        //Clear last canvas
+        if (canvas)
+            container.removeChild(canvas);
+
+        //check if it's too little or too big
+        if ( ! isInt(currentBiometer.biometerWidth) || currentBiometer.biometerWidth < 300  || currentBiometer.biometerWidth > 5000)
+        {
+            return;
+        }
+
+        //check if border are too high
+        if ( ! isInt(currentBiometer.biometerBorderWidth) || currentBiometer.biometerBorderWidth > 200)
+        {
+            return;
+        }
+
+        var canvasWidth = currentBiometer.biometerWidth;
+        var titleMargin = 10;
+        if (currentBiometer.biometerTitleDisplay == true || currentBiometer.biometerWatermarkDisplay == true) {
+            var bottomMargin = (titleMargin * 2) + (currentBiometer.biometerTitleFontSize * 1) + (currentBiometer.biometerBorderWidth / 2) + 10;
+        }
+        else
+            var bottomMargin = 20 + (currentBiometer.biometerBorderWidth / 2);
+            
+
+        var sideMargin = 20 + (currentBiometer.biometerBorderWidth / 2);
+        var topMargin = 20;
+        var marginText = 10;
+        var biometerCenterWidth = 50;
+
+        var biometerWidth = canvasWidth - (sideMargin * 2);
+
+        var canvasHeight = biometerWidth / 2 + topMargin + bottomMargin;
+
+        var biometerRayon = biometerWidth/2;
+        var biometerLeftX = (canvasWidth - biometerWidth) /2;
+        var biometerRightX = biometerWidth + biometerLeftX;
+
+        var biometerCenterX = canvasWidth/2;
+        var biometerCenterY = topMargin + biometerRayon;
+      
+        //Create the canvas
+        var canvas = document.createElement("canvas");
+        canvas.id = "canvas";
+        if (container.clientWidth < currentBiometer.biometerWidth)
+            canvas.className = "big";
+        canvas.height = canvasHeight;
+        canvas.width = canvasWidth;
+        container.appendChild(canvas);
+
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        //background
+        if (currentBiometer.biometersetbg == true) {
+            currentBiometer.biometerbg = "transparent"
+        }
+        else 
+        {
+            currentBiometer.biometerbg = "white"
+        }
+        ctx.fillStyle = currentBiometer.biometerbg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+
+        ctx.strokeStyle = currentBiometer.biometerBorderColor;
+        //Arc de cercle
+        ctx.lineWidth = currentBiometer.biometerBorderWidth;
+        ctx.beginPath();
+        ctx.arc(biometerCenterX, biometerCenterY, biometerRayon, (Math.PI/180)*180, (Math.PI/180)*360);
+        ctx.stroke();
+        
+        //bottom line
+        ctx.beginPath();
+        ctx.moveTo(biometerLeftX - (currentBiometer.biometerBorderWidth / 2), biometerCenterY);
+        ctx.lineTo(biometerRightX + (currentBiometer.biometerBorderWidth / 2), biometerCenterY);
+        ctx.stroke();
+        ctx.lineWidth = currentBiometer.biometerLineWidth;
+
+        //Change origine    
+        ctx.translate(biometerCenterX, biometerCenterY);
+
+        var group = currentBiometer.groups[0];
+        var items = currentBiometer.groups[0].items;
+        var nbRow = items.length;
+
+        //Draw row
+        var angle = 180 / nbRow;
+        var hauteur = biometerRayon * Math.sin((Math.PI/180) * angle/2);
+        var marge = (hauteur - group.groupFontSize/2);
+        var ratio = hauteur / (angle / 2);
+        ctx.font = group.groupFontSize+"px Calibri,Geneva,Arial,Sans";
+        ctx.textBaseline = "middle";
+
+        var textHeight = ctx.measureText('M').width;
+
+        for(i = 0; i < nbRow; i++)
+        {
+            ctx.rotate((Math.PI/180)*angle);
+            //Draw Line Not last one
+            if (i + 1 != nbRow)
+            {
+                ctx.beginPath();
+                ctx.moveTo(-biometerRayon, 0);            
+                ctx.lineTo(0, 0);
+                ctx.strokeStyle = currentBiometer.biometerBorderColor;
+                ctx.stroke();
+            }
+            //Write text before half
+            if (angle*(i) < 90)
+            {
+                ctx.rotate((Math.PI/180) * -1 * (marge + (textHeight/2)) / ratio);
+                //ctx.font = group.groupFontSize+"px Calibri,Geneva,Arial,Sans";
+                ctx.fillStyle = group.groupFontColor;
+                ctx.fillText(items[ i ].text, (biometerRayon - marginText - (currentBiometer.biometerBorderWidth / 2)) * -1, 0);
+
+                ctx.rotate((Math.PI/180) * 1 * (marge + (textHeight/2)) / ratio);
+            }
+            //Write text after half
+            else
+            {
+                ctx.rotate((Math.PI/180) * -180);
+                ctx.rotate((Math.PI/180) * -1 * (marge + (textHeight/2)) / ratio);
+                //ctx.font = group.groupFontSize+"px Calibri,Geneva,Arial,Sans";
+                ctx.fillStyle = group.groupFontColor;
+                ctx.fillText(items[ i ].text, biometerRayon - ctx.measureText(items[ i ].text).width - marginText - (currentBiometer.biometerBorderWidth / 2), 0);
+
+                ctx.rotate((Math.PI/180) * (marge + (textHeight/2)) / ratio);
+                ctx.rotate((Math.PI/180) * 180);
+            }
+        }
+
+        ctx.rotate((Math.PI/180)*-180 );
+        ctx.translate(-1 * biometerCenterX, -1 * biometerCenterY);
+
+        ctx.fillStyle = currentBiometer.biometerbg;
+        ctx.beginPath();
+        ctx.arc(biometerCenterX, biometerCenterY, biometerCenterWidth, (Math.PI/180)*0, (Math.PI/180)*360);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(biometerCenterX, biometerCenterY, biometerCenterWidth, (Math.PI/180)*180, (Math.PI/180)*360);
+        ctx.stroke();
+
+        if (currentBiometer.biometertouchline == true) {
+        ctx.lineWidth = currentBiometer.biometerBorderWidth;
+        ctx.beginPath();
+        ctx.moveTo(biometerLeftX - (currentBiometer.biometerBorderWidth / 2), biometerCenterY);
+        ctx.lineTo(biometerRightX + (currentBiometer.biometerBorderWidth / 2), biometerCenterY);
+        ctx.stroke();
+        }
+
+        //Display title
+        if (currentBiometer.biometerTitleDisplay == true) {
+            ctx.font = currentBiometer.biometerTitleFontSize+"px Calibri,Geneva,Arial,Sans";
+            var y = canvasHeight;
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = currentBiometer.biometerTitleColor;
+            ctx.fillText(currentBiometer.biometerTitle, ((canvasWidth - ctx.measureText(currentBiometer.biometerTitle).width) / 2), y-30);
+            
+        }
+        if (currentBiometer.biometerWatermarkDisplay == true) {
+            var y = canvasHeight;
+            ctx.font = "15px Calibri";
+            ctx.fillStyle = "GREY";
+            ctx.fillText(currentBiometer.biometerWatermark, (canvasWidth - ctx.measureText(currentBiometer.biometerWatermark).width)-10, y-10);
+        }
+    }
+
+    function isInt(value) {
+        return ! isNaN(value) && parseInt(Number(value)) == value && ! isNaN(parseInt(value, 10));
+    }
+
+    //var truncate = require("truncate-utf8-bytes");
+
+    var illegalRe = /[\/\?<>\\:\*\|":]/g;
+    var controlRe = /[\x00-\x1f\x80-\x9f]/g;
+    var reservedRe = /^\.+$/;
+    var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+    var windowsTrailingRe = /[\. ]+$/;
+
+    function sanitize(input, replacement) {
+      var sanitized = input
+        .replace(illegalRe, replacement)
+        .replace(controlRe, replacement)
+        .replace(reservedRe, replacement)
+        .replace(windowsReservedRe, replacement)
+        .replace(windowsTrailingRe, replacement);
+      return sanitized.substring(0, 255);
+    }
+
+    //For electron open link in a real browser
+    if (typeof process  != 'undefined' && typeof process.versions.electron != 'undefined') {
+        var shell = require('electron').shell;
+        //open link in a modal if localhost or file
+        $('.ls-modal').on('click', function(e){
+            e.preventDefault();
+            shell.openExternal($(this).attr('href'));
+            //$('#browserModal').modal('show').find('.modal-body').html('<iframe style="width: calc(100% + 28px);height:calc(100% + 28px);margin: -14px;border: 0;" src="'+$(this).attr('href')+'"></iframe>');
+        });
+    }
+
+    </script>
+    </body>
+</html>

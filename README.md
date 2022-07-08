@@ -1,11 +1,10 @@
 
 ## MyBiometer
 Web Application to generate biometers or dowsing dials
-
-MyBiometer is free software made with <3
-#Originally Developed by Brouillon, Modified for personal usage by @Meet
-https://framagit.org/Brouillon/myBiometer
-
+  
+MyBiometer is free software Originally Developed by Brouillon, Modified for personal usage by @Meet  
+https://framagit.org/Brouillon/myBiometer  
+  
 ## What did I modified?
 .Simplified the homepage  
 .Translated the website to English from French changing all required string values  
@@ -18,17 +17,17 @@ https://framagit.org/Brouillon/myBiometer
 .Redesigned the borders to have same thickness in circumference as well as the base  
 .Changed few default values also added few placeholder text  
 .Made the website slightly responsive to smaller width devices (mobiles)  
-
-## Visit Subtil.net to be able to use more features online
-https://www.subtil.net/en/
-
+  
+## Visit Subtil.net to be able to use more features online  
+https://www.subtil.net/en/  
+  
 ## List of third-party libraries used in the project:
 - Bootstrap http://getbootstrap.com/
 - Vuejs https://vuejs.org
 - Smalltalk https://github.com/coderaiser/smalltalk
 - Sortable https://github.com/RubaXa/Sortable
-
-## This project was just modified for personal use, however you are free to download and use it.
-
+  
+## This project was just modified for personal use, however you are free to download and use it.  
+  
 ## Licence
 GPLv3

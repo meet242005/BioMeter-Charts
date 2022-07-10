@@ -1,54 +1,36 @@
-# MyBiometer
+## Experience this site live:  
+https://meet242005.github.io/WebsiteDevProject/  
+  
+## MyBiometer
 Web Application to generate biometers or dowsing dials
-
-For developers / users a mailing list is available:
-https://framalistes.org/sympa/subscribe/mybiometer
-
-MyBiometer is free software made with <3
-
-## Online use
-http://draft.frama.io/myBiometer
-
-## Offline use
-
-### HTML version
-- Download link :
-https://framagit.org/Draft/myBiometer/repository/archive.zip?ref=master
-
-- Unzip the archive
-- Open the index.html file with your browser
-
-### Packed version with chromium (electron)
-- Linux https://framagit.org/Draft/myBiometer/raw/binrelease/MyBiometer-linux-x64.zip
-- Win64 https://framagit.org/Draft/myBiometer/raw/binrelease/MyBiometer-win32-x64.zip
-- The mac version is being tested
-
-## Integration on your website
-Use the code https://framagit.org/Brouillon/myBiometer/snippets/472, to embed the application on your site
-
-## TODO
-
-### Features
-- Multiline management? in the boxes we press enter == newline and when press del remove?
-- Horizontal writing in the boxes
-- Customization font and color of each box
-- Customization of the background colors of the boxes
-- Multi-group management
-- Website for sharing biometers?
-
-### Coded
-- Limit value for font size?
-- Create global variables for max width/border/nbitem values
-- Unique functions for checking values
-
-### Other
-- Video presentation / documentation
-
+  
+MyBiometer is free software Originally Developed by Brouillon, Modified for personal usage by @Meet  
+https://framagit.org/Brouillon/myBiometer  
+  
+## What did I modified?
+-Simplified the homepage  
+-Translated the website to English from French changing all required string values  
+-Added Ability to insert custom watermark  
+-Added feature to show/hide watermark  
+-Added feature to change the inner lines width  
+-Added option to touch the ends of base line  
+-Added ability to change the ouput background to transparent  
+-Redesigned the chart canvas to align the title and the watermark to the base of the canvas instead of top  
+-Redesigned the borders to have same thickness in circumference as well as the base  
+-Changed few default values also added few placeholder text  
+-Made the website slightly responsive to smaller width devices (mobiles)  
+-Added ability to generate 360 degree charts  
+  
+## Visit Subtil.net to be able to use more features online  
+https://www.subtil.net/en/  
+  
 ## List of third-party libraries used in the project:
 - Bootstrap http://getbootstrap.com/
 - Vuejs https://vuejs.org
 - Smalltalk https://github.com/coderaiser/smalltalk
 - Sortable https://github.com/RubaXa/Sortable
-
+  
+## This project was just modified for personal use, however you are free to use it.  
+  
 ## Licence
 GPLv3

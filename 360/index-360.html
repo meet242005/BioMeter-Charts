@@ -24,7 +24,7 @@
 <head>
 
     <meta charset="utf-8">
-    <title>Charts</title>
+    <title>Charts 360°</title>
 
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -149,7 +149,7 @@
     <div id="myBiometer">
         <div>
             <form id="formControl" onsubmit="return false;">
-                <h1><img src="favicon.png" style="width:47px" /> Charts</h1>
+                <h1><img src="favicon.png" style="width:47px" /> Charts 360°</h1>
 
                 <div id="biometerList">
                     <br />
@@ -176,8 +176,7 @@
                             </table>
 
                             <div style="padding: 10px">
-                                <a class="btn btn-primary btn-sm btn-block" id="newBiometer" v-on:click="newBiometer()"><span class="glyphicon glyphicon-plus"></span> Create a New Chart</a>
-                                <a class="btn btn-primary btn-sm btn-block" id="newBiometer" href="360/index-360.html"><span class="glyphicon glyphicon-plus"></span> Create a New Chart 360°</a>
+                                <a class="btn btn-primary btn-sm btn-block" id="newBiometer" v-on:click="newBiometer()"><span class="glyphicon glyphicon-plus"></span> Create a New Chart 360°</a>
                                 <br />
                                 <div class="alert alert-info" role="alert">
                                     The data is saved automatically on your browser, you can also <a id="downloadBiometersData" href="#" v-on:click="downloadBiometersData()"><u>download</u></a>
@@ -225,12 +224,11 @@
                             <div class="form-group">
                                 <label>Inner Lines Width :</label>
                                 <input type="text" v-model="mybiometer.biometerLineWidth" v-on:focus="focusBorder($event)" v-on:change="changeBorder($event)" class="form-control input-sm" id="biometerLineWidth" name="biometerLineWidth" >
-                                <div class="form-inline">
+                              <!-- <div class="form-inline">
                                     <div class="form-group">
                                         <label for="biometerTitleDisplay">  Touch Ends of Bottom Lines? :</label>
                                         <input type="checkbox" v-model="mybiometer.biometertouchline" v-on:focus="focusTitleFontSize($event)" v-on:change="changeTitleFontSize($event)" class="form-control input-sm" id="biometertouchline" />    
-                                    </div>
-                                    
+                                    </div> -->
                                 </div>
                                 </div>
                             </div>
@@ -974,7 +972,7 @@
 
         var canvasHeight = biometerWidth / 2 + topMargin + bottomMargin;
 
-        var biometerRayon = biometerWidth/2;
+        var biometerRayon = canvasHeight/2;
         var biometerLeftX = (canvasWidth - biometerWidth) /2;
         var biometerRightX = biometerWidth + biometerLeftX;
 
@@ -986,7 +984,7 @@
         canvas.id = "canvas";
         if (container.clientWidth < currentBiometer.biometerWidth)
             canvas.className = "big";
-        canvas.height = canvasHeight;
+        canvas.height = canvasHeight+100;
         canvas.width = canvasWidth;
         container.appendChild(canvas);
 
@@ -1009,15 +1007,16 @@
         //Arc de cercle
         ctx.lineWidth = currentBiometer.biometerBorderWidth;
         ctx.beginPath();
-        ctx.arc(biometerCenterX, biometerCenterY, biometerRayon, (Math.PI/180)*180, (Math.PI/180)*360);
+        ctx.arc(canvasWidth/2, canvasHeight/2+20, canvasHeight/2, 0, 360);
         ctx.stroke();
         
         //bottom line
-        ctx.beginPath();
-        ctx.moveTo(biometerLeftX - (currentBiometer.biometerBorderWidth / 2), biometerCenterY);
-        ctx.lineTo(biometerRightX + (currentBiometer.biometerBorderWidth / 2), biometerCenterY);
-        ctx.stroke();
         ctx.lineWidth = currentBiometer.biometerLineWidth;
+        ctx.beginPath();
+        ctx.moveTo(biometerCenterX-biometerRayon, biometerCenterY);
+        ctx.lineTo(biometerCenterX, biometerCenterY);
+        ctx.stroke();
+      
 
         //Change origine    
         ctx.translate(biometerCenterX, biometerCenterY);
@@ -1027,7 +1026,7 @@
         var nbRow = items.length;
 
         //Draw row
-        var angle = 180 / nbRow;
+        var angle = 360 / nbRow;
         var hauteur = biometerRayon * Math.sin((Math.PI/180) * angle/2);
         var marge = (hauteur - group.groupFontSize/2);
         var ratio = hauteur / (angle / 2);
@@ -1072,7 +1071,7 @@
             }
         }
 
-        ctx.rotate((Math.PI/180)*-180 );
+        ctx.rotate((Math.PI/180)*-360 );
         ctx.translate(-1 * biometerCenterX, -1 * biometerCenterY);
 
         ctx.fillStyle = currentBiometer.biometerbg;
@@ -1080,31 +1079,31 @@
         ctx.arc(biometerCenterX, biometerCenterY, biometerCenterWidth, (Math.PI/180)*0, (Math.PI/180)*360);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(biometerCenterX, biometerCenterY, biometerCenterWidth, (Math.PI/180)*180, (Math.PI/180)*360);
+        //ctx.arc(biometerCenterX, biometerCenterY, biometerCenterWidth, (Math.PI/180)*180, (Math.PI/180)*360);
         ctx.stroke();
 
-        if (currentBiometer.biometertouchline == true) {
+        /*if (currentBiometer.biometertouchline == true) {
         ctx.lineWidth = currentBiometer.biometerBorderWidth;
         ctx.beginPath();
         ctx.moveTo(biometerLeftX - (currentBiometer.biometerBorderWidth / 2), biometerCenterY);
         ctx.lineTo(biometerRightX + (currentBiometer.biometerBorderWidth / 2), biometerCenterY);
         ctx.stroke();
-        }
+        }*/
 
         //Display title
         if (currentBiometer.biometerTitleDisplay == true) {
             ctx.font = currentBiometer.biometerTitleFontSize+"px Calibri,Geneva,Arial,Sans";
-            var y = canvasHeight;
+            var y = canvasHeight+60;
             ctx.textBaseline = "middle";
             ctx.fillStyle = currentBiometer.biometerTitleColor;
-            ctx.fillText(currentBiometer.biometerTitle, ((canvasWidth - ctx.measureText(currentBiometer.biometerTitle).width) / 2), y-30);
+            ctx.fillText(currentBiometer.biometerTitle, ((canvasWidth - ctx.measureText(currentBiometer.biometerTitle).width) / 2), y);
             
         }
         if (currentBiometer.biometerWatermarkDisplay == true) {
-            var y = canvasHeight;
+            var y = canvasHeight+60;
             ctx.font = "15px Calibri";
             ctx.fillStyle = "GREY";
-            ctx.fillText(currentBiometer.biometerWatermark, (canvasWidth - ctx.measureText(currentBiometer.biometerWatermark).width)-10, y-10);
+            ctx.fillText(currentBiometer.biometerWatermark, (canvasWidth - ctx.measureText(currentBiometer.biometerWatermark).width)-10, y);
         }
     }
 

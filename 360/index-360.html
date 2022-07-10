@@ -1048,7 +1048,7 @@
                 ctx.stroke();
             }
             //Write text before half
-            if (angle*(i) < 90 || angle*(i) > 270)
+            if (angle*(i) < 90 || angle*(i) >= 270)
             {
                 ctx.rotate((Math.PI/180) * -1 * (marge + (textHeight/2)) / ratio);
                 //ctx.font = group.groupFontSize+"px Calibri,Geneva,Arial,Sans";

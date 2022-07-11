@@ -1,6 +1,9 @@
 ## Experience this site live:  
 https://meet242005.github.io/BioMeter-Charts/  
   
+## Download this software for PC:  
+https://drive.google.com/file/d/10qG9JJ6QBaCnlRuMIBvIFR6XYeAaXH4t/view?usp=sharing  
+  
 ## MyBiometer
 Web Application to generate biometers or dowsing dials
   
@@ -8,6 +11,7 @@ MyBiometer is free software Originally Developed by Brouillon, Modified for pers
 https://framagit.org/Brouillon/myBiometer  
   
 ## What did I modified?
+-LATEST: Created a Windows Executable software of the web app using Electron .js
 -Simplified the homepage  
 -Translated the website to English from French changing all required string values  
 -Added Ability to insert custom watermark  
